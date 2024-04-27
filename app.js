@@ -58,7 +58,7 @@ app.get('/:code', (req, res) => {
   if (longUrl !== null) {
     res.redirect(longUrl);
   } else {
-    res.status(404).send('此短網址不存在');
+    res.status(404).send('The short URL does not exist');
   }
 });
 

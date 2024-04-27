@@ -1,6 +1,9 @@
 <h3>Success! Please use this link:</h3>
-<a href="{{ shortUrl }}">{{ shortUrl }}</a>
+<a id="shortUrl" href="{{ shortUrl }}">{{ shortUrl }}</a>
 <p>You entered: {{ url }}</p>
 <div class="mb-3">
-  <a class="btn btn-primary" href="/" role="button">Shorten another URL</a>
+  <a class="btn btn-outline-primary" href="/" role="button">
+    <i class="fa-solid fa-house"></i> Shorten another URL
+  </a>
+  <button class="btn btn-outline-primary" id="copyButton">Copy URL</button>
 </div>

@@ -13,25 +13,33 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.render('index')
-})
+  res.render('index');
+});
 
 app.post('/submit', (req, res) => {
   const longUrl = req.body.url;
-  let code = ''
-  console.log(longUrl)
+  let code = '';
+  //console.log(longUrl)
+  // check if the url already has code generated
   if (urlDatabase[longUrl] !== undefined) {
-    code = urlDatabase[longUrl]
-    console.log(!urlDatabase[longUrl])
+    code = urlDatabase[longUrl];
+    //console.log(!urlDatabase[longUrl])
   } else {
-    code = generateRandomCode()
-    console.log(code)
-    urlDatabase[longUrl] = code
+    //console.log(urlDatabase[longUrl])
+    const codeSet = new Set(Object.values(urlDatabase));
+    // make sure the code is unique, if not, generate again
+    do {
+      code = generateRandomCode();
+      //console.log(`code: ${code}`)
+    } while (codeSet.has(code))
+
+    urlDatabase[longUrl] = code;
+    //console.log(`urlDatabase: ${Object.entries(urlDatabase)}`)
   }
-  const shortUrl = `http://localhost:3000/${code}`
-  console.log(shortUrl)
-  res.render('shortUrl', { url: req.body.url, shortUrl })
-})
+  const shortUrl = `http://localhost:3000/${code}`;
+  //console.log(`shortUrl: ${shortUrl}`)
+  res.render('shortUrl', { url: req.body.url, shortUrl });
+});
 
 function generateRandomCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -41,8 +49,28 @@ function generateRandomCode() {
   }
 
   return result;
-}
+};
+
+app.get('/:code', (req, res) => {
+  const code = req.params.code;
+  let longUrl = findLongUrlByCode(code);
+  //console.log(`longUrl: ${longUrl}`)
+  if (longUrl !== null) {
+    res.redirect(longUrl);
+  } else {
+    res.status(404).send('此短網址不存在');
+  }
+});
+
+function findLongUrlByCode(code) {
+  for (let key in urlDatabase) {
+    if (urlDatabase[key] === code) {
+      return key;
+    }
+  }
+  return null; // 如果沒有找到，返回null
+};
 
 app.listen(port, () => {
-  console.log(`express server is running on http://localhost:${port}`)
+  console.log(`express server is running on http://localhost:${port}`);
 })
